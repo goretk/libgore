@@ -1,0 +1,13 @@
+language: go
+
+os:
+  - linux
+
+services:
+  - docker
+
+before_install:
+  - make docker_container
+
+script:
+  - make release
