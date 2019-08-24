@@ -44,6 +44,21 @@ func close(filePath *C.char) {
 	removeArena(fp)
 }
 
+//export setGoVersion
+func setGoVersion(filePath *C.char, version *C.char) C.int {
+	fp := C.GoString(filePath)
+	f := getFile(fp)
+	if f == nil {
+		return 0
+	}
+	ver := C.GoString(version)
+	err := f.SetGoVersion(ver)
+	if err != nil {
+		return 0
+	}
+	return 1
+}
+
 //export getCompilerVersion
 func getCompilerVersion(filePath *C.char) *C.struct_compilerVersion {
 	fp := C.GoString(filePath)
