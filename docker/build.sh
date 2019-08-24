@@ -1,4 +1,4 @@
 #!/bin/sh
 
-cd /go/src/github.com/goretk/libgore
+cd /go/libgore
 HOME=/tmp make linux windows
