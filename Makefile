@@ -19,10 +19,12 @@ ERROR_COLOR=\033[31;01m
 WARN_COLOR=\033[33;01m
 MAKE_COLOR=\033[33;01m%-20s\033[0m
 
-APP_FILES=$(APP).so $(APP).dll $(APP).h
+APP_FILES=$(APP).so $(APP).dll $(APP).dylib $(APP).h
 PACKAGE=$(APP)-$(VERSION)
 LINUX_BUILD_FOLDER=build/linux
 LINUX_ARCHIVE=$(PACKAGE)-linux-amd64.tar.gz
+DARWIN_BUILD_FOLDER=build/darwin
+DARWIN_ARCHIVE=$(PACKAGE)-darwin-amd64.tar.gz
 WINDOWS_ARCHIVE=$(APP)-$(VERSION)-windows.zip
 WINDOWS_BUILD_FOLDER=build/windows
 TAR_ARGS=cfz
@@ -33,6 +35,7 @@ CGO=CGO_ENABLED=1
 BUILD_OPTS=-ldflags="-s -w" -buildmode=c-shared
 WINDOWS_GO_ENV=GOOS=windows $(ARCH) $(CGO) CC=x86_64-w64-mingw32-gcc
 LINUX_GO_ENV=GOOS=linux $(ARCH) $(CGO)
+DARWIN_GO_ENV=GOOS=darwin $(ARCH) $(CGO) CC=o64-clang
 
 .DEFAULT_GOAL := help
 
@@ -40,6 +43,11 @@ LINUX_GO_ENV=GOOS=linux $(ARCH) $(CGO)
 help:
 	@echo -e "$(OK_COLOR)==== $(APP) [$(VERSION)] ====$(NO_COLOR)"
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "$(MAKE_COLOR) : %s\n", $$1, $$2}'
+
+.PHONY: darwin
+darwin: ## Make binary for macOS
+	@echo -e "$(OK_COLOR)[$(APP)] Build for macOS$(NO_COLOR)"
+	@$(DARWIN_GO_ENV) $(GO) build -o $(APP).dylib $(BUILD_OPTS) .
 
 .PHONY: windows
 windows: ## Make binary for Windows
@@ -78,12 +86,17 @@ $(LINUX_ARCHIVE): $(APP).so $(APP).h
 	@cp $(RELEASE_FILES) $(APP).so $(APP).h $(LINUX_BUILD_FOLDER)/$(PACKAGE)/.
 	@tar $(TAR_ARGS) $(LINUX_ARCHIVE) -C $(LINUX_BUILD_FOLDER) $(PACKAGE)
 
+$(DARWIN_ARCHIVE): $(APP).dylib $(APP).h
+	@mkdir -p $(DARWIN_BUILD_FOLDER)/$(PACKAGE)
+	@cp $(RELEASE_FILES) $(APP).dylib $(APP).h $(DARWIN_BUILD_FOLDER)/$(PACKAGE)/.
+	@tar $(TAR_ARGS) $(DARWIN_ARCHIVE) -C $(DARWIN_BUILD_FOLDER) $(PACKAGE)
+
 $(WINDOWS_ARCHIVE): $(APP).dll $(APP).h
 	@mkdir -p $(WINDOWS_BUILD_FOLDER)/$(PACKAGE)
 	@cp $(RELEASE_FILES) $(APP).dll $(APP).h $(WINDOWS_BUILD_FOLDER)/$(PACKAGE)/.
 	@cd $(WINDOWS_BUILD_FOLDER) && zip -r $(DIR)/$(WINDOWS_ARCHIVE) $(PACKAGE) > /dev/null
 
-release: $(LINUX_ARCHIVE) $(WINDOWS_ARCHIVE) ## Make release archives
+release: $(LINUX_ARCHIVE) $(WINDOWS_ARCHIVE) $(DARWIN_ARCHIVE) ## Make release archives
 
 docker_build: $(APP_FILES) ## Build using docker container
 
