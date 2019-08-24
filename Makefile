@@ -68,7 +68,7 @@ docker_container: ## Build build-container
 
 $(APP_FILES):
 	@echo -e "$(OK_COLOR)[$(APP)] Build using docker container$(NO_COLOR)"
-	@docker run -it --rm -u $(UID):$(GID) -v $(GOPATH):/go $(CONTAINER_NAME)
+	@docker run -it --rm -u $(UID):$(GID) -v $(DIR):/go/libgore $(CONTAINER_NAME)
 	@cat structs.h >> libgore.h
 
 .PHONY: release
