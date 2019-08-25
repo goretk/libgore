@@ -78,6 +78,8 @@ $(APP_FILES):
 	@echo -e "$(OK_COLOR)[$(APP)] Build using docker container$(NO_COLOR)"
 	@docker run -it --rm -u $(UID):$(GID) -v $(DIR):/go/libgore $(CONTAINER_NAME)
 	@cat structs.h >> libgore.h
+	@sed -i -e 's/^\#include <stdlib.h>//' libgore.h
+	@sed -i -e 's/^\#include "structs.h"//' libgore.h
 
 .PHONY: release
 
