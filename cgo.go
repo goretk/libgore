@@ -16,8 +16,8 @@ import (
 	"github.com/goretk/gore"
 )
 
-//export open
-func open(filePath *C.char) C.int {
+//export gore_open
+func gore_open(filePath *C.char) C.int {
 	fp := C.GoString(filePath)
 	f, err := gore.Open(fp)
 	if err != nil {
@@ -29,8 +29,8 @@ func open(filePath *C.char) C.int {
 	return C.int(1)
 }
 
-//export close
-func close(filePath *C.char) {
+//export gore_close
+func gore_close(filePath *C.char) {
 	fp := C.GoString(filePath)
 	f := getFile(fp)
 	if f == nil {
@@ -44,8 +44,8 @@ func close(filePath *C.char) {
 	removeArena(fp)
 }
 
-//export setGoVersion
-func setGoVersion(filePath *C.char, version *C.char) C.int {
+//export gore_setGoVersion
+func gore_setGoVersion(filePath *C.char, version *C.char) C.int {
 	fp := C.GoString(filePath)
 	f := getFile(fp)
 	if f == nil {
@@ -59,8 +59,8 @@ func setGoVersion(filePath *C.char, version *C.char) C.int {
 	return 1
 }
 
-//export getCompilerVersion
-func getCompilerVersion(filePath *C.char) *C.struct_compilerVersion {
+//export gore_getCompilerVersion
+func gore_getCompilerVersion(filePath *C.char) *C.struct_compilerVersion {
 	fp := C.GoString(filePath)
 	f := getFile(fp)
 	if f == nil {
@@ -81,8 +81,8 @@ func getCompilerVersion(filePath *C.char) *C.struct_compilerVersion {
 	return cs
 }
 
-//export getPackages
-func getPackages(filePath *C.char) *C.struct_packages {
+//export gore_getPackages
+func gore_getPackages(filePath *C.char) *C.struct_packages {
 	fp := C.GoString(filePath)
 	f := getFile(fp)
 	if f == nil {
@@ -99,8 +99,8 @@ func getPackages(filePath *C.char) *C.struct_packages {
 	return convertPackages(pkgs, a)
 }
 
-//export getVendors
-func getVendors(filePath *C.char) *C.struct_packages {
+//export gore_getVendors
+func gore_getVendors(filePath *C.char) *C.struct_packages {
 	fp := C.GoString(filePath)
 	f := getFile(fp)
 	if f == nil {
@@ -117,8 +117,8 @@ func getVendors(filePath *C.char) *C.struct_packages {
 	return convertPackages(pkgs, a)
 }
 
-//export getSTDLib
-func getSTDLib(filePath *C.char) *C.struct_packages {
+//export gore_getSTDLib
+func gore_getSTDLib(filePath *C.char) *C.struct_packages {
 	fp := C.GoString(filePath)
 	f := getFile(fp)
 	if f == nil {
@@ -135,8 +135,8 @@ func getSTDLib(filePath *C.char) *C.struct_packages {
 	return convertPackages(pkgs, a)
 }
 
-//export getUnknown
-func getUnknown(filePath *C.char) *C.struct_packages {
+//export gore_getUnknown
+func gore_getUnknown(filePath *C.char) *C.struct_packages {
 	fp := C.GoString(filePath)
 	f := getFile(fp)
 	if f == nil {
@@ -153,8 +153,8 @@ func getUnknown(filePath *C.char) *C.struct_packages {
 	return convertPackages(pkgs, a)
 }
 
-//export getTypes
-func getTypes(filePath *C.char) *C.struct_types {
+//export gore_getTypes
+func gore_getTypes(filePath *C.char) *C.struct_types {
 	fp := C.GoString(filePath)
 	f := getFile(fp)
 	if f == nil {
