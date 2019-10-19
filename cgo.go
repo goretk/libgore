@@ -44,6 +44,21 @@ func gore_close(filePath *C.char) {
 	removeArena(fp)
 }
 
+//export gore_build_id
+func gore_build_id(filePath *C.char) *C.char {
+	fp := C.GoString(filePath)
+	f := getFile(fp)
+	if f == nil {
+		return nil
+	}
+	arena := getArena(fp)
+	if arena == nil {
+		return nil
+	}
+	id := f.BuildID
+	return arena.cstring(id)
+}
+
 //export gore_setGoVersion
 func gore_setGoVersion(filePath *C.char, version *C.char) C.int {
 	fp := C.GoString(filePath)
