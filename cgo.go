@@ -215,14 +215,44 @@ func convertType(t *gore.GoType, arena *arena, parsed map[uint64]*C.struct_type)
 	ct.addr = C.ulonglong(t.Addr)
 	ct.ptrResolved = C.ulonglong(t.PtrResolvAddr)
 	ct.packagePath = arena.cstring(t.PackagePath)
-	ct.fields = convertTypes(t.Fields, arena, parsed)
-	ct.fieldName = arena.cstring(t.FieldName)
-	ct.fieldTag = arena.cstring(t.FieldTag)
-	if t.FieldAnon {
-		ct.fieldAnon = C.int(1)
+
+	// Allocate memory for field information.
+	pr := (*C.struct_types)(arena.calloc(C.sizeof_struct_types, 1))
+	if len(t.Fields) != 0 {
+		// Allocate an array for the fields on the C-heap.
+		val := (**C.struct_type)(arena.calloc(C.sizeof_struct_type, len(t.Fields)))
+		// Make a slice "handler" for the array.
+		pval := (*[1 << 30]*C.struct_type)(unsafe.Pointer(val))[:len(t.Fields):len(t.Fields)]
+
+		for i, field := range t.Fields {
+			f := (*C.struct_type)(arena.calloc(C.sizeof_struct_type, 1))
+			f.fieldName = arena.cstring(field.FieldName)
+			// TODO: Tags aren't parsed correctly. For now an empty string is used to prevent
+			// bad data.
+			f.fieldTag = arena.cstring("")
+			if field.FieldAnon {
+				f.fieldAnon = C.int(1)
+			} else {
+				f.fieldAnon = C.int(0)
+			}
+			f.kind = C.uint(field.Kind)
+			f.name = arena.cstring(field.Name)
+			f.addr = C.ulonglong(field.Addr)
+
+			// Add the field struct to the slice.
+			pval[i] = f
+		}
+
+		// Add the pointer to the array and length of the array to the fields struct.
+		pr.types = val
+		pr.length = C.ulong(len(t.Fields))
 	} else {
-		ct.fieldAnon = C.int(0)
+		// If the type doesn't have any fields, ensure the length parameter is
+		// set to 0.
+		pr.length = C.ulong(0)
 	}
+	ct.fields = pr
+
 	ct.element = convertType(t.Element, arena, parsed)
 	ct.length = C.int(t.Length)
 	ct.chanDir = C.int(t.ChanDir)
