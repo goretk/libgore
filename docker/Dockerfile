@@ -1,5 +1,5 @@
 # FROM karalabe/xgo-latest
-FROM golang
+FROM golang:latest
 MAINTAINER Go Reverse Engineering Tool Kit
 RUN \
   apt-get update && \
