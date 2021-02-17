@@ -13,13 +13,13 @@ ENV OSX_SDK     MacOSX10.11.sdk
 ENV OSX_NDK_X86 /usr/local/osx-ndk-x86
 
 RUN \
-  OSX_SDK_PATH=https://s3.dockerproject.org/darwin/v2/$OSX_SDK.tar.xz && \
+  OSX_SDK_PATH=https://joakimkennedy.keybase.pub/files/MacOSX10.15.sdk.tar.xz && \
   wget -nc $OSX_SDK_PATH && \
   \
   git clone https://github.com/tpoechtrager/osxcross.git && \
   mv `basename $OSX_SDK_PATH` osxcross/tarballs/        && \
   \
-  PORTABLE=yes UNATTENDED=yes OSX_VERSION_MIN=10.6 osxcross/build.sh               && \
+  PORTABLE=yes UNATTENDED=yes OSX_VERSION_MIN=10.9 osxcross/build.sh               && \
   mv osxcross/target $OSX_NDK_X86                                                   && \
   \
   rm -rf ./osxcross
