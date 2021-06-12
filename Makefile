@@ -35,7 +35,7 @@ CGO=CGO_ENABLED=1
 BUILD_OPTS=-ldflags="-s -w" -buildmode=c-shared
 WINDOWS_GO_ENV=GOOS=windows $(ARCH) $(CGO) CC=x86_64-w64-mingw32-gcc
 LINUX_GO_ENV=GOOS=linux $(ARCH) $(CGO)
-DARWIN_GO_ENV=GOOS=darwin $(ARCH) $(CGO) CC=o64-clang
+DARWIN_GO_ENV=GOOS=darwin $(ARCH) $(CGO)
 
 .DEFAULT_GOAL := help
 
@@ -83,22 +83,25 @@ $(APP_FILES):
 
 .PHONY: release
 
-$(LINUX_ARCHIVE): $(APP).so $(APP).h
+$(LINUX_ARCHIVE): linux
 	@mkdir -p $(LINUX_BUILD_FOLDER)/$(PACKAGE)
 	@cp $(RELEASE_FILES) $(APP).so $(APP).h $(LINUX_BUILD_FOLDER)/$(PACKAGE)/.
 	@tar $(TAR_ARGS) $(LINUX_ARCHIVE) -C $(LINUX_BUILD_FOLDER) $(PACKAGE)
 
-$(DARWIN_ARCHIVE): $(APP).dylib $(APP).h
+$(DARWIN_ARCHIVE): darwin
 	@mkdir -p $(DARWIN_BUILD_FOLDER)/$(PACKAGE)
 	@cp $(RELEASE_FILES) $(APP).dylib $(APP).h $(DARWIN_BUILD_FOLDER)/$(PACKAGE)/.
 	@tar $(TAR_ARGS) $(DARWIN_ARCHIVE) -C $(DARWIN_BUILD_FOLDER) $(PACKAGE)
 
-$(WINDOWS_ARCHIVE): $(APP).dll $(APP).h
+$(WINDOWS_ARCHIVE): windows
 	@mkdir -p $(WINDOWS_BUILD_FOLDER)/$(PACKAGE)
 	@cp $(RELEASE_FILES) $(APP).dll $(APP).h $(WINDOWS_BUILD_FOLDER)/$(PACKAGE)/.
 	@cd $(WINDOWS_BUILD_FOLDER) && zip -r $(DIR)/$(WINDOWS_ARCHIVE) $(PACKAGE) > /dev/null
 
 release: $(LINUX_ARCHIVE) $(WINDOWS_ARCHIVE) $(DARWIN_ARCHIVE) ## Make release archives
+release_windows: $(WINDOWS_ARCHIVE) ## Make release archive for Windows
+release_darwin: $(DARWIN_ARCHIVE) ## Make release archive for Darwin
+release_linux: $(LINUX_ARCHIVE) ## Make release archive for Linux
 
 docker_build: $(APP_FILES) ## Build using docker container
 
