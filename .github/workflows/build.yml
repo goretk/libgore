@@ -29,14 +29,18 @@ jobs:
         make release_windows
         
     - uses: actions/upload-artifact@v2
+      if: startsWith(github.ref, 'refs/tags/')
       with:
         name: linux-archive
+        retention-days: 1
         path: libgore-*linux-amd64.tar.gz
         
     
     - uses: actions/upload-artifact@v2
+      if: startsWith(github.ref, 'refs/tags/')
       with:
         name: windows-archive
+        retention-days: 1
         path: libgore-*windows.zip
         
   build_macos:
@@ -54,8 +58,10 @@ jobs:
         make release_darwin
         
     - uses: actions/upload-artifact@v2
+      if: startsWith(github.ref, 'refs/tags/')
       with:
         name: darwin-archive
+        retention-days: 1
         path: libgore-*darwin-amd64.tar.gz
         
   release:
