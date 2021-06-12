@@ -28,6 +28,17 @@ jobs:
         make release_linux
         make release_windows
         
+    - uses: actions/upload-artifact@v2
+      with:
+        name: linux-archive
+        path: libgore-*linux-amd64.tar.gz
+        
+    
+    - uses: actions/upload-artifact@v2
+      with:
+        name: windows-archive
+        path: libgore-*windows.zip
+        
   build_macos:
     runs-on: macos-latest 
     steps:
@@ -41,3 +52,33 @@ jobs:
     - name: Build
       run: |
         make release_darwin
+        
+    - uses: actions/upload-artifact@v2
+      with:
+        name: darwin-archive
+        path: libgore-*darwin-amd64.tar.gz
+        
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [build_macos, build_linux_and_windows]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Linux archive
+        uses: actions/download-artifact@v2
+        with:
+          name: linux-archive
+      
+      - name: Download macOS archive
+        uses: actions/download-artifact@v2
+        with:
+          name: darwin-archive
+          
+      - name: Download Windows archive
+        uses: actions/download-artifact@v2
+        with:
+          name: windows-archive
+          
+      - name: Upload files to a GitHub release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create -d ${{ github.ref }} *.tar.gz *.zip
