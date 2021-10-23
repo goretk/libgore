@@ -308,12 +308,8 @@ func convertPackages(pkgs []*gore.Package, arena *arena) *C.struct_packages {
 		for j, m := range p.Methods {
 			cf := (*C.struct_function)(arena.malloc(C.sizeof_struct_function))
 			cf.name = arena.cstring(m.Name)
-			cf.srcLineLength = C.int(m.SrcLineLength)
-			cf.srcLineStart = C.int(m.SrcLineStart)
-			cf.srcLineEnd = C.int(m.SrcLineEnd)
 			cf.offset = C.ulonglong(m.Offset)
 			cf.end = C.ulonglong(m.End)
-			cf.fileName = arena.cstring(m.Filename)
 			cf.packageName = arena.cstring(m.PackageName)
 			cm := (*C.struct_method)(arena.malloc(C.sizeof_struct_method))
 			cm.receiver = arena.cstring(m.Receiver)
@@ -334,12 +330,8 @@ func convertPackages(pkgs []*gore.Package, arena *arena) *C.struct_packages {
 func convertFunction(f *gore.Function, arena *arena) *C.struct_function {
 	cf := (*C.struct_function)(arena.malloc(C.sizeof_struct_function))
 	cf.name = arena.cstring(f.Name)
-	cf.srcLineLength = C.int(f.SrcLineLength)
-	cf.srcLineStart = C.int(f.SrcLineStart)
-	cf.srcLineEnd = C.int(f.SrcLineEnd)
 	cf.offset = C.ulonglong(f.Offset)
 	cf.end = C.ulonglong(f.End)
-	cf.fileName = arena.cstring(f.Filename)
 	cf.packageName = arena.cstring(f.PackageName)
 	return cf
 }
