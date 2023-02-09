@@ -30,7 +30,6 @@ WINDOWS_BUILD_FOLDER=build/windows
 TAR_ARGS=cfz
 RELEASE_FILES=LICENSE README.md
 
-ARCH=GOARCH=amd64
 CGO=CGO_ENABLED=1
 BUILD_OPTS=-ldflags="-s -w" -buildmode=c-shared
 WINDOWS_GO_ENV=GOOS=windows $(ARCH) $(CGO) CC=x86_64-w64-mingw32-gcc
@@ -47,7 +46,10 @@ help:
 .PHONY: darwin
 darwin: ## Make binary for macOS
 	@echo -e "$(OK_COLOR)[$(APP)] Build for macOS$(NO_COLOR)"
-	@$(DARWIN_GO_ENV) $(GO) build -o $(APP).dylib $(BUILD_OPTS) .
+	@GOARCH=amd64 $(DARWIN_GO_ENV) $(GO) build -o $(APP).amd64.dylib $(BUILD_OPTS) .
+	@GOARCH=arm64 $(DARWIN_GO_ENV) $(GO) build -o $(APP).arm64.dylib $(BUILD_OPTS) .
+	@lipo -create -output $(APP).dylib $(APP).amd64.dylib $(APP).arm64.dylib
+	@rm $(APP).amd64.dylib $(APP).arm64.dylib
 
 .PHONY: windows
 windows: ## Make binary for Windows
