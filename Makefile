@@ -30,11 +30,12 @@ WINDOWS_BUILD_FOLDER=build/windows
 TAR_ARGS=cfz
 RELEASE_FILES=LICENSE README.md
 
+ARCH=GOARCH=amd64
 CGO=CGO_ENABLED=1
 BUILD_OPTS=-ldflags="-s -w" -buildmode=c-shared
 WINDOWS_GO_ENV=GOOS=windows $(ARCH) $(CGO) CC=x86_64-w64-mingw32-gcc
 LINUX_GO_ENV=GOOS=linux $(ARCH) $(CGO)
-DARWIN_GO_ENV=GOOS=darwin $(ARCH) $(CGO)
+DARWIN_GO_ENV=GOOS=darwin $(CGO)
 
 .DEFAULT_GOAL := help
 
